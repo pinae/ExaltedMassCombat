@@ -4,6 +4,7 @@
 import os
 import sys
 import pygame
+from actor import Actor
 pygame.init()
 
 
@@ -14,8 +15,8 @@ class Game(object):
 
         self.screen = pygame.display.set_mode(self.size)
 
-        self.fighter = pygame.image.load(os.path.join("images", "fighter32.png")).convert_alpha()
-        self.fighter_rect = self.fighter.get_rect()
+        self.fighter = Actor()
+        self.fighter.set_surface(self.screen)
 
         while True:
             self.draw_frame()
@@ -25,14 +26,14 @@ class Game(object):
             if event.type == pygame.QUIT:
                 sys.exit()
 
-        self.fighter_rect = self.fighter_rect.move(self.speed)
-        if self.fighter_rect.left < 0 or self.fighter_rect.right > self.width:
+        self.fighter.move(self.speed)
+        if self.fighter.left() < 0 or self.fighter.right() > self.width:
             self.speed[0] = -self.speed[0]
-        if self.fighter_rect.top < 0 or self.fighter_rect.bottom > self.height:
+        if self.fighter.top() < 0 or self.fighter.bottom() > self.height:
             self.speed[1] = -self.speed[1]
 
         self.screen.fill((255, 255, 255))
-        self.screen.blit(self.fighter, self.fighter_rect)
+        self.fighter.draw()
         pygame.display.flip()
         pygame.time.wait(20)
 

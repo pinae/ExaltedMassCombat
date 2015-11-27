@@ -4,17 +4,18 @@
 import os
 from config import SPRITE_SIZE
 from pygame import image
+from pygame.transform import smoothscale
 
 
 class Drawable(object):
     def __init__(self):
         self.sprite = None
-        self.set_image(os.path.join("images", str(SPRITE_SIZE), "none.png"))
+        self.set_image(os.path.join("images", "none.png"))
         self.rect = self.sprite.get_rect()
         self.surface = None
 
     def set_image(self, filename):
-        self.sprite = image.load(filename).convert_alpha()
+        self.sprite = smoothscale(image.load(filename).convert_alpha(), (SPRITE_SIZE, SPRITE_SIZE))
 
     def set_surface(self, surface):
         self.surface = surface

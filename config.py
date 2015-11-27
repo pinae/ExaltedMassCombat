@@ -1,4 +1,4 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-SPRITE_SIZE = 32
+SPRITE_SIZE = 64

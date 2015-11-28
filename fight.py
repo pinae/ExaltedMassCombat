@@ -5,6 +5,7 @@ import os
 import sys
 import pygame
 from actor import Actor
+from config import SELECTION_COLOR
 pygame.init()
 
 
@@ -14,6 +15,8 @@ class Game(object):
         self.speed = [2, 2]
 
         self.screen = pygame.display.set_mode(self.size)
+
+        self.selection = None
 
         self.fighter = Actor()
         self.fighter.set_surface(self.screen)
@@ -25,6 +28,11 @@ class Game(object):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self.selection = event.pos
+            if event.type == pygame.MOUSEBUTTONUP:
+                #select
+                self.selection = None
 
         self.fighter.move(self.speed)
         if self.fighter.left() < 0 or self.fighter.right() > self.width:
@@ -34,6 +42,15 @@ class Game(object):
 
         self.screen.fill((255, 255, 255))
         self.fighter.draw()
+        if self.selection:
+            mouse_position = pygame.mouse.get_pos()
+            pygame.draw.rect(
+                self.screen,
+                SELECTION_COLOR,
+                pygame.Rect(
+                    self.selection,
+                    (mouse_position[0] - self.selection[0], mouse_position[1] - self.selection[1])),
+                1)
         pygame.display.flip()
         pygame.time.wait(20)
 

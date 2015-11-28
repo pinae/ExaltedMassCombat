@@ -20,6 +20,7 @@ class Game(object):
         self.actors = []
         hugo = Actor()
         hugo.set_surface(self.screen)
+        hugo.set_position(100, 100)
         self.actors.append(hugo)
         self.selected_actors = []
 

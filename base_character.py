@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from random import randint
+from weapon_factory import WeaponFactory
 
 
 class BaseCharacter(object):
@@ -27,14 +28,22 @@ class BaseCharacter(object):
         self.essence = 1
         self.backgrounds = {}
         self.willpower_purchased = 0
+        self.weapon = WeaponFactory.get_punch_hand()
+        self.health_levels = [0, -1, -1, -2, -2, -4, -1000]
+        self.wounds = {
+            "bashing": 0,
+            "lethal": 0
+        }
 
     @staticmethod
-    def roll(pool):
+    def roll(pool, damage=False):
         successes = 0
         ones = 0
         for _ in range(pool):
             die = randint(1, 10)
             if die >= 7:
+                successes += 1
+            if not damage and die == 10:
                 successes += 1
             if die == 1:
                 ones += 1
@@ -56,7 +65,7 @@ class BaseCharacter(object):
         return self.virtues[second_highest_virtue] + self.virtues[max_virtue] + self.willpower_purchased
 
     def ability_check(self, attribute, ability):
-        return self.roll(self.get_attribute(attribute) + self.get_ability(ability))
+        return self.roll(max(self.get_attribute(attribute) + self.get_ability(ability) + self.get_wound_penalty(), 0))
 
     def virtue_check(self, virtue):
         return self.roll(self.get_virtue(virtue))
@@ -94,3 +103,33 @@ class BaseCharacter(object):
         if virtue not in self.virtues.keys():
             raise KeyError(virtue + "is not a valid virtue name.")
         return self.virtues[virtue]
+
+    def attack(self, dv):
+        successes = self.ability_check("dexterity", self.weapon["ability"])
+        if successes < 0:
+            # Botch: Hitting myself without DV.
+            self.soak(self.get_attribute("strength") + self.weapon["damage"], self.weapon["damage type"])
+        if successes < dv:
+            return 0
+        return self.get_attribute("strength") + self.weapon["damage"] + successes - dv, self.weapon["damage type"]
+
+    def soak(self, damage, damage_type):
+        wounds = self.roll(damage, damage=True)
+        if damage_type not in ["B", "L"]:
+            raise ValueError(damage_type + " is not a valid damage type. Valid are B and L.")
+        if damage_type == "B":
+            if self.wounds["bashing"] + wounds > len(self.health_levels):
+                bashing_overflow = self.wounds["bashing"] + wounds - len(self.health_levels)
+                self.wounds["bashing"] = len(self.health_levels)
+                self.wounds["lethal"] += bashing_overflow
+            else:
+                self.wounds["bashing"] += wounds
+        if damage_type == "L":
+            self.wounds["lethal"] += wounds
+            self.wounds["bashing"] = max(self.wounds["bashing"], self.wounds["lethal"])
+
+    def is_alive(self):
+        return self.wounds["lethal"] < len(self.health_levels) and self.wounds["bashing"] < len(self.health_levels)
+
+    def get_wound_penalty(self):
+        return self.health_levels[max(self.wounds["bashing"], self.wounds["lethal"])]

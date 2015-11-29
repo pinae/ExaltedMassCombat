@@ -42,7 +42,7 @@ class BaseCharacter(object):
             return -1
         return successes
 
-    def willpower(self):
+    def get_willpower(self):
         max_virtue = "compassion"
         for virtue in self.virtues.keys():
             if self.virtues[virtue] > self.virtues[max_virtue]:
@@ -56,17 +56,10 @@ class BaseCharacter(object):
         return self.virtues[second_highest_virtue] + self.virtues[max_virtue] + self.willpower_purchased
 
     def ability_check(self, attribute, ability):
-        if attribute not in self.attributes.keys():
-            raise KeyError(attribute + " is not a valid attribute name.")
-        if ability not in self.abilities.keys():
-            return self.roll(self.attributes[attribute])
-        else:
-            return self.roll(self.attributes[attribute] + self.abilities[ability])
+        return self.roll(self.get_attribute(attribute) + self.get_ability(ability))
 
     def virtue_check(self, virtue):
-        if virtue not in self.virtues.keys():
-            raise KeyError(virtue + "is not a valid virtue name.")
-        return self.roll(self.virtues[virtue])
+        return self.roll(self.get_virtue(virtue))
 
     def set_attribute(self, attribute, value):
         if attribute not in self.attributes.keys():
@@ -74,10 +67,21 @@ class BaseCharacter(object):
         if value < 1 or value > 5:
             raise ValueError("Attribute values have to be in the range 1 to 5.")
 
+    def get_attribute(self, attribute):
+        if attribute not in self.attributes.keys():
+            raise KeyError(attribute + " is not a valid attribute name.")
+        return self.attributes[attribute]
+
     def set_ability(self, ability, value):
         if value < 1 or value > 5:
             raise ValueError("Ability values have to be in the range 1 to 5.")
         self.abilities[ability] = value
+
+    def get_ability(self, ability):
+        if ability in self.abilities.keys():
+            return self.abilities[ability]
+        else:
+            return 0
 
     def set_virtue(self, virtue, value):
         if virtue not in self.virtues.keys():
@@ -85,3 +89,8 @@ class BaseCharacter(object):
         if value < 1 or value > 5:
             raise ValueError("Virtue values have to be in the range 1 to 5.")
         self.virtues[virtue] = value
+
+    def get_virtue(self, virtue):
+        if virtue not in self.virtues.keys():
+            raise KeyError(virtue + "is not a valid virtue name.")
+        return self.virtues[virtue]

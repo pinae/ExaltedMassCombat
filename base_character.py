@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from random import randint
+from math import floor
 from weapon_factory import WeaponFactory
 from actor import Actor
 
@@ -135,3 +136,15 @@ class BaseCharacter(Actor):
 
     def get_wound_penalty(self):
         return self.health_levels[max(self.wounds["bashing"], self.wounds["lethal"])]
+
+    def get_dodge_dv(self):
+        return int(floor((self.get_attribute("dexterity") +
+                          self.get_ability("dodge")) / 2)) + self.get_wound_penalty()
+
+    def get_parry_dv(self):
+        return int(floor((self.get_attribute("dexterity") +
+                          self.get_ability(self.weapon["ability"]) +
+                          self.weapon["defense"]) / 2)) + self.get_wound_penalty()
+
+    def get_best_dv(self):
+        return max(self.get_dodge_dv(), self.get_parry_dv())

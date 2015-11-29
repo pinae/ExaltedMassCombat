@@ -3,7 +3,7 @@
 
 import sys
 import pygame
-from actor import Actor
+from character_factory import CharacterFactory
 from config import SELECTION_COLOR
 pygame.init()
 
@@ -18,7 +18,7 @@ class Game(object):
         self.selection = None
 
         self.actors = []
-        hugo = Actor()
+        hugo = CharacterFactory.create_random_mortal()
         hugo.set_surface(self.screen)
         hugo.set_position(100, 100)
         self.actors.append(hugo)

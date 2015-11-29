@@ -3,10 +3,12 @@
 
 from random import randint
 from weapon_factory import WeaponFactory
+from actor import Actor
 
 
-class BaseCharacter(object):
+class BaseCharacter(Actor):
     def __init__(self):
+        super(BaseCharacter, self).__init__()
         self.attributes = {
             "dexterity": 1,
             "strength": 1,

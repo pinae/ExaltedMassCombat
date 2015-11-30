@@ -68,7 +68,10 @@ class BaseCharacter(Actor):
         return self.virtues[second_highest_virtue] + self.virtues[max_virtue] + self.willpower_purchased
 
     def ability_check(self, attribute, ability):
-        return self.roll(max(self.get_attribute(attribute) + self.get_ability(ability) + self.get_wound_penalty(), 0))
+        return self.roll(
+            min(self.get_attribute(attribute) + self.get_ability(ability),
+                max(self.get_attribute(attribute) + self.get_ability(ability) + self.get_wound_penalty(), self.essence))
+        )
 
     def virtue_check(self, virtue):
         return self.roll(self.get_virtue(virtue))

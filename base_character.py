@@ -151,3 +151,11 @@ class BaseCharacter(Actor):
 
     def get_best_dv(self):
         return max(self.get_dodge_dv(), self.get_parry_dv())
+
+    def initiative(self):
+        return self.ability_check("perception", "awareness")
+
+    def act(self):
+        # if enemy in range: hit
+        # else: go towards target position
+        pass

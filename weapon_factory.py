@@ -13,7 +13,8 @@ class WeaponFactory(object):
             "damage": 0,
             "damage type": "B",
             "defense": 2,
-            "rate": 3
+            "rate": 3,
+            "range": 0
         }
 
     @staticmethod
@@ -26,7 +27,8 @@ class WeaponFactory(object):
             "damage": 3,
             "damage type": "B",
             "defense": -2,
-            "rate": 2
+            "rate": 2,
+            "range": 0.2
         }
 
     @staticmethod
@@ -39,7 +41,8 @@ class WeaponFactory(object):
             "damage": 3,
             "damage type": "L",
             "defense": 1,
-            "rate": 2
+            "rate": 2,
+            "range": 0.9
         }
 
     @staticmethod
@@ -52,5 +55,6 @@ class WeaponFactory(object):
             "damage": 4,
             "damage type": "L",
             "defense": 2,
-            "rate": 2
+            "rate": 2,
+            "range": 1.5
         }

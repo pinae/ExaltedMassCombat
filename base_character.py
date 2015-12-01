@@ -155,7 +155,10 @@ class BaseCharacter(Actor):
     def initiative(self):
         return self.ability_check("perception", "awareness")
 
-    def act(self):
+    def get_movement_distance(self):
+        return self.attributes["dexterity"]
+
+    def act(self, fighters):
         # if enemy in range: hit
         # else: go towards target position
         pass

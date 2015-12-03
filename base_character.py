@@ -5,6 +5,8 @@ from random import randint
 from math import floor
 from weapon_factory import WeaponFactory
 from actor import Actor
+from config import SPRITE_SIZE
+from pygame.math import Vector2
 
 
 class BaseCharacter(Actor):
@@ -37,6 +39,7 @@ class BaseCharacter(Actor):
             "bashing": 0,
             "lethal": 0
         }
+        self.fraction = None
 
     @staticmethod
     def roll(pool, damage=False):
@@ -110,6 +113,12 @@ class BaseCharacter(Actor):
             raise KeyError(virtue + "is not a valid virtue name.")
         return self.virtues[virtue]
 
+    def set_fraction(self, fraction):
+        self.fraction = fraction
+
+    def get_fraction(self):
+        return self.fraction
+
     def attack(self, dv):
         successes = self.ability_check("dexterity", self.weapon["ability"])
         if successes < 0:
@@ -159,6 +168,24 @@ class BaseCharacter(Actor):
         return self.attributes["dexterity"]
 
     def act(self, fighters):
-        # if enemy in range: hit
-        # else: go towards target position
-        pass
+        nearest_enemy = None
+        nearest_enemy_distance = 1000000
+        for fighter in fighters:
+            if not fighter.get_fraction() or not self.get_fraction() or fighter.get_fraction() != self.get_fraction():
+                dx = (self.position()[0] - fighter.position()[0]) / SPRITE_SIZE
+                dy = (self.position()[1] - fighter.position()[1]) / SPRITE_SIZE
+                if dx * dx + dy * dy < nearest_enemy_distance:
+                    nearest_enemy = fighter
+                    nearest_enemy_distance = dx * dx + dy * dy
+        max_attack_range = (0.5 + self.weapon["range"] + self.get_movement_distance())
+        if nearest_enemy_distance <= max_attack_range * max_attack_range:
+            # The nearest enemy is in range.
+            attack_range = (0.5 + self.weapon["range"])
+            if nearest_enemy_distance > attack_range * attack_range:
+                self.move((nearest_enemy.position() - self.position()).scale_to_length(
+                    (max_attack_range - attack_range) * SPRITE_SIZE))
+            damage = self.attack(nearest_enemy.get_best_dv())
+            nearest_enemy.soak(damage)
+        elif self.get_target_position() is not None:
+            self.move((self.get_target_postion() - self.position).scale_to_length(
+                self.get_movement_distance() * SPRITE_SIZE))

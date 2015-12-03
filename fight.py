@@ -5,13 +5,14 @@ import sys
 import pygame
 from character_factory import CharacterFactory
 from config import SELECTION_COLOR
+from pygame.math import Vector2
 pygame.init()
 
 
 class Game(object):
     def __init__(self):
         self.size = self.width, self.height = 1024, 768
-        self.speed = [2, 2]
+        self.speed = Vector2(2, 2)
 
         self.screen = pygame.display.set_mode(self.size)
 
@@ -20,7 +21,7 @@ class Game(object):
         self.actors = []
         hugo = CharacterFactory.create_random_mortal()
         hugo.set_surface(self.screen)
-        hugo.set_position(100, 100)
+        hugo.set_position(Vector2(100, 100))
         self.actors.append(hugo)
         self.selected_actors = []
 
@@ -48,9 +49,9 @@ class Game(object):
 
         self.actors[0].move(self.speed)
         if self.actors[0].left() < 0 or self.actors[0].right() > self.width:
-            self.speed[0] = -self.speed[0]
+            self.speed.x = -self.speed.x
         if self.actors[0].top() < 0 or self.actors[0].bottom() > self.height:
-            self.speed[1] = -self.speed[1]
+            self.speed.y = -self.speed.y
 
         self.screen.fill((255, 255, 255))
         for actor in self.actors:

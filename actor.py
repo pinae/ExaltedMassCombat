@@ -17,7 +17,8 @@ class Actor(Drawable):
         self.direction = 0
         self.selected = False
         self.create_sprite()
-        self.position = (0, 0)
+        self.position = Vector2(0, 0)
+        self.target_position = None
 
     def create_sprite(self):
         rotated = rotate(self.base_image, -(self.direction + 90))
@@ -30,33 +31,39 @@ class Actor(Drawable):
                 8)
         self.sprite = smoothscale(rotated, (SPRITE_SIZE, SPRITE_SIZE))
 
-    def set_position(self, left, top):
-        self.position = (left, top)
+    def set_position(self, new_position):
+        self.position = new_position
         sprite_rect = self.sprite.get_rect()
         self.rect = Rect(
-            left - sprite_rect.width // 2,
-            top - sprite_rect.height // 2,
-            left - sprite_rect.width // 2 + sprite_rect.width,
-            top - sprite_rect.height // 2 + sprite_rect.height)
+            new_position.x - sprite_rect.width // 2,
+            new_position.y - sprite_rect.height // 2,
+            new_position.x - sprite_rect.width // 2 + sprite_rect.width,
+            new_position.y - sprite_rect.height // 2 + sprite_rect.height)
+
+    def set_target_position(self, target_vector=None):
+        self.target_position = target_vector
+
+    def get_target_position(self):
+        return self.target_position
 
     def position(self):
         return self.position
 
     def left(self):
-        return self.position[0] - SPRITE_SIZE // 2
+        return self.position.x - SPRITE_SIZE // 2
 
     def right(self):
-        return self.position[0] - SPRITE_SIZE // 2 + SPRITE_SIZE
+        return self.position.x - SPRITE_SIZE // 2 + SPRITE_SIZE
 
     def top(self):
-        return self.position[1] - SPRITE_SIZE // 2
+        return self.position.y - SPRITE_SIZE // 2
 
     def bottom(self):
-        return self.position[1] - SPRITE_SIZE // 2 + SPRITE_SIZE
+        return self.position.y - SPRITE_SIZE // 2 + SPRITE_SIZE
 
     def move(self, offset):
-        self.set_position(self.position[0] + offset[0], self.position[1] + offset[1])
-        distance, direction = Vector2(offset[0], offset[1]).as_polar()
+        self.set_position(self.position + offset)
+        distance, direction = offset.as_polar()
         self.set_direction(direction)
 
     def set_direction(self, direction):

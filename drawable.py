@@ -5,6 +5,7 @@ import os
 from config import SPRITE_SIZE
 from pygame import image
 from pygame.transform import smoothscale
+from pygame.math import Vector2
 
 
 class Drawable(object):
@@ -20,12 +21,12 @@ class Drawable(object):
     def set_surface(self, surface):
         self.surface = surface
 
-    def set_position(self, left, top):
-        self.rect.left = left
-        self.rect.top = top
+    def set_position(self, new_position):
+        self.rect.left = new_position.x
+        self.rect.top = new_position.y
 
     def position(self):
-        return self.rect.left, self.rect.top
+        return Vector2(self.rect.left, self.rect.top)
 
     def left(self):
         return self.rect.left

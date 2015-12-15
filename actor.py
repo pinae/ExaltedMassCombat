@@ -21,15 +21,17 @@ class Actor(Drawable):
         self.target_position = None
 
     def create_sprite(self):
-        rotated = rotate(self.base_image, -(self.direction + 90))
+        base = self.base_image.copy()
         if self.selected:
             circle(
-                rotated,
+                base,
                 SELECTION_COLOR,
-                (182, 182),
-                138,
+                (128, 128),
+                128,
                 8)
-        self.sprite = smoothscale(rotated, (SPRITE_SIZE, SPRITE_SIZE))
+        rotated = rotate(base, -(self.direction + 90))
+        self.sprite = smoothscale(rotated, (round(rotated.get_width() * SPRITE_SIZE / self.base_image.get_width()),
+                                            round(rotated.get_height() * SPRITE_SIZE / self.base_image.get_width())))
 
     def set_position(self, new_position):
         self.position = new_position
@@ -46,7 +48,7 @@ class Actor(Drawable):
     def get_target_position(self):
         return self.target_position
 
-    def position(self):
+    def get_position(self):
         return self.position
 
     def left(self):
@@ -62,9 +64,9 @@ class Actor(Drawable):
         return self.position.y - SPRITE_SIZE // 2 + SPRITE_SIZE
 
     def move(self, offset):
-        self.set_position(self.position + offset)
         distance, direction = offset.as_polar()
         self.set_direction(direction)
+        self.set_position(self.get_position() + offset)
 
     def set_direction(self, direction):
         self.direction = direction
@@ -75,6 +77,7 @@ class Actor(Drawable):
             self.selected = True
         else:
             self.selected = self.rect.colliderect(selection_rect)
+        self.create_sprite()
         return self.selected
 
     def deselect(self):

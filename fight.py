@@ -15,19 +15,19 @@ class Game(object):
         self.size = self.width, self.height = 1024, 768
         self.speed = [Vector2(2, 2),
                       Vector2(3, 1),
-                      Vector2(4, 0),
+                      Vector2(3, 0),
                       Vector2(3, -1),
                       Vector2(2, -2),
                       Vector2(1, -3),
-                      Vector2(0, -4),
+                      Vector2(0, -3),
                       Vector2(-1, -3),
                       Vector2(-2, -2),
                       Vector2(-3, -1),
-                      Vector2(-4, 0),
+                      Vector2(-3, 0),
                       Vector2(-3, 1),
                       Vector2(-2, 2),
                       Vector2(-1, 3),
-                      Vector2(0, 4),
+                      Vector2(0, 3),
                       Vector2(1, 3)]
         self.speed_index = 0
 
@@ -78,8 +78,8 @@ class Game(object):
                         actor.select()
                     self.selected_actors = previously_selected_actors
 
-        self.actors[1].move(self.speed[self.speed_index//10])
-        self.speed_index = (self.speed_index + 1) % (len(self.speed) * 10)
+        self.actors[1].move(self.speed[self.speed_index//20])
+        self.speed_index = (self.speed_index + 1) % (len(self.speed) * 20)
         #if self.actors[0].left() < 0 or self.actors[0].right() > self.width:
         #    self.speed.x = -self.speed.x
         #if self.actors[0].top() < 0 or self.actors[0].bottom() > self.height:

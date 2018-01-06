@@ -6,8 +6,18 @@ from random import shuffle, randint
 
 
 class CharacterFactory(object):
-    @staticmethod
-    def create_random_mortal(name=None):
+    def __init__(self):
+        self.character_number = 0
+        self.used_character_names = []
+
+    def create_random_mortal(self, name=None):
+        self.character_number += 1
+        if not name:
+            name = "Unnamed character " + str(self.character_number)
+        if name in self.used_character_names:
+            raise KeyError(name + " is already used for another character. Use another name.")
+        else:
+            self.used_character_names.append(name)
         char = BaseCharacter(name)
         attributes = [["strength", "dexterity", "stamina"],
                       ["manipulation", "charisma", "appearance"],
@@ -18,7 +28,7 @@ class CharacterFactory(object):
                 bonused_attribute = attributes[i][randint(0, len(attributes[i]) - 1)]
                 char.set_attribute(bonused_attribute, char.get_attribute(bonused_attribute) + 1)
                 if char.get_attribute(bonused_attribute) >= 5:
-                    attributes[i].pop(bonused_attribute)
+                    del attributes[i][bonused_attribute]
         abilities = [
             "archery", "martial arts", "melee", "thrown", "war",
             "athletics", "awareness", "dodge", "larceny", "stealth",
@@ -30,13 +40,13 @@ class CharacterFactory(object):
             bonused_ability = abilities[randint(0, len(abilities) - 1)]
             char.set_ability(bonused_ability, char.get_ability(bonused_ability) + 1)
             if char.get_ability(bonused_ability) >= 5:
-                abilities.pop(bonused_ability)
+                del abilities[bonused_ability]
         # This poor guy has not spent any of his 21 bonus points.
         return char
 
-    @staticmethod
-    def create_random_heroic_mortal():
-        char = BaseCharacter()
+    def create_random_heroic_mortal(self, name=None):
+        self.character_number += 1
+        char = BaseCharacter(name)
         attributes = [["strength", "dexterity", "stamina"],
                       ["manipulation", "charisma", "appearance"],
                       ["intelligence", "wits", "perception"]]
@@ -46,7 +56,7 @@ class CharacterFactory(object):
                 bonused_attribute = attributes[i][randint(0, len(attributes[i]) - 1)]
                 char.set_attribute(bonused_attribute, char.get_attribute(bonused_attribute) + 1)
                 if char.get_attribute(bonused_attribute) >= 5:
-                    attributes[i].pop(bonused_attribute)
+                    del attributes[i][bonused_attribute]
         abilities = [
             "archery", "martial arts", "melee", "thrown", "war",
             "athletics", "awareness", "dodge", "larceny", "stealth",
@@ -58,6 +68,9 @@ class CharacterFactory(object):
             bonused_ability = abilities[randint(0, len(abilities) - 1)]
             char.set_ability(bonused_ability, char.get_ability(bonused_ability) + 1)
             if char.get_ability(bonused_ability) >= 5:
-                abilities.pop(bonused_ability)
+                del abilities[bonused_ability]
         # This poor guy has not spent any of his 21 bonus points.
         return char
+
+    def get_number_of_created_characters(self):
+        return self.character_number

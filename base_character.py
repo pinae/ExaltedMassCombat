@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from random import randint
 from math import floor
 from weapon_factory import WeaponFactory
 from actor import Actor
@@ -11,11 +10,8 @@ from pygame.math import Vector2
 
 
 class BaseCharacter(Actor):
-    def __init__(self, name=None):
-        if not name:
-            self.name = "Unnamed character " + str(randint(0, 2**32))
-        else:
-            self.name = name
+    def __init__(self, name):
+        self.name = name
         super(BaseCharacter, self).__init__()
         self.attributes = {
             "dexterity": 1,
@@ -67,6 +63,9 @@ class BaseCharacter(Actor):
         if successes == 0 and ones > 0:
             return -1
         return successes
+
+    def get_name(self):
+        return self.name
 
     def get_willpower(self):
         max_virtue = "compassion"
@@ -136,7 +135,7 @@ class BaseCharacter(Actor):
             # Botch: Hitting myself without DV.
             self.soak(self.get_attribute("strength") + self.weapon["damage"], self.weapon["damage type"])
         if successes < dv:
-            return 0
+            return 0, 'B'
         return self.get_attribute("strength") + self.weapon["damage"] + successes - dv, self.weapon["damage type"]
 
     def soak(self, damage, damage_type):
@@ -176,27 +175,36 @@ class BaseCharacter(Actor):
         return self.ability_check("perception", "awareness")
 
     def get_movement_distance(self):
-        return self.attributes["dexterity"]
+        return self.attributes["dexterity"] - self.get_wound_penalty()
 
     def act(self, fighters):
         nearest_enemy = None
         nearest_enemy_distance = 1000000
         for fighter in fighters:
-            if not fighter.get_fraction() or not self.get_fraction() or fighter.get_fraction() != self.get_fraction():
-                dx = (self.position()[0] - fighter.position()[0]) / SPRITE_SIZE
-                dy = (self.position()[1] - fighter.position()[1]) / SPRITE_SIZE
+            if fighter.get_name() != self.get_name() and (
+                    not fighter.get_fraction() or
+                    not self.get_fraction() or
+                    fighter.get_fraction() != self.get_fraction()):
+                dx = (self.get_position()[0] - fighter.get_position()[0]) / SPRITE_SIZE
+                dy = (self.get_position()[1] - fighter.get_position()[1]) / SPRITE_SIZE
                 if dx * dx + dy * dy < nearest_enemy_distance:
                     nearest_enemy = fighter
                     nearest_enemy_distance = dx * dx + dy * dy
         max_attack_range = (0.5 + self.weapon["range"] + self.get_movement_distance())
-        if nearest_enemy_distance <= max_attack_range * max_attack_range:
-            # The nearest enemy is in range.
+        if nearest_enemy_distance <= max_attack_range * max_attack_range:  # The nearest enemy is in range.
             attack_range = (0.5 + self.weapon["range"])
             if nearest_enemy_distance > attack_range * attack_range:
-                self.move((nearest_enemy.position() - self.position()).scale_to_length(
-                    (max_attack_range - attack_range) * SPRITE_SIZE))
-            damage = self.attack(nearest_enemy.get_best_dv())
-            nearest_enemy.soak(damage)
+                positional_offset = nearest_enemy.get_position() - self.get_position()
+                positional_offset.scale_to_length((max_attack_range - attack_range) * SPRITE_SIZE)
+                self.move(positional_offset)
+            damage, damage_type = self.attack(nearest_enemy.get_best_dv())
+            nearest_enemy.soak(damage, damage_type)
+            return self.weapon['speed']
         elif self.get_target_position() is not None:
-            self.move((self.get_target_postion() - self.position).scale_to_length(
-                self.get_movement_distance() * SPRITE_SIZE))
+            positional_offset = self.get_target_position() - self.get_position()
+            positional_offset.scale_to_length(self.get_movement_distance() * SPRITE_SIZE)
+            print("{}: Moving to position {}.".format(self.name, positional_offset))
+            self.move(positional_offset)
+            return 1
+        else:  # We wait because we have no orders.
+            return 1

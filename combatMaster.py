@@ -34,9 +34,12 @@ class CombatMaster(object):
             self.battle_wheel[(self.now + 6) % len(self.battle_wheel)].append(character)
 
     def tick(self):
+        print("------- Tick -------")
         for character in self.battle_wheel[self.now]:
+            print(character)
             if character.is_alive():
                 speed = character.act(self.fighters)
+                print("{} starts his action for {} ticks.".format(character, speed))
                 self.battle_wheel[(self.now + speed) % len(self.battle_wheel)].append(character)
         self.battle_wheel[self.now] = []
         for i, character in enumerate(self.fighters):

@@ -7,8 +7,8 @@ from random import shuffle, randint
 
 class CharacterFactory(object):
     @staticmethod
-    def create_random_mortal():
-        char = BaseCharacter()
+    def create_random_mortal(name=None):
+        char = BaseCharacter(name)
         attributes = [["strength", "dexterity", "stamina"],
                       ["manipulation", "charisma", "appearance"],
                       ["intelligence", "wits", "perception"]]

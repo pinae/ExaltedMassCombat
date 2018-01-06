@@ -6,11 +6,16 @@ from math import floor
 from weapon_factory import WeaponFactory
 from actor import Actor
 from config import SPRITE_SIZE
+from random import randint
 from pygame.math import Vector2
 
 
 class BaseCharacter(Actor):
-    def __init__(self):
+    def __init__(self, name=None):
+        if not name:
+            self.name = "Unnamed character " + str(randint(0, 2**32))
+        else:
+            self.name = name
         super(BaseCharacter, self).__init__()
         self.attributes = {
             "dexterity": 1,
@@ -40,6 +45,12 @@ class BaseCharacter(Actor):
             "lethal": 0
         }
         self.fraction = None
+
+    def __str__(self):
+        return "Character {}".format(self.name)
+
+    def __repr__(self):
+        return self.__str__()
 
     @staticmethod
     def roll(pool, damage=False):

@@ -198,6 +198,8 @@ class BaseCharacter(Actor):
                 positional_offset.scale_to_length((max_attack_range - attack_range) * SPRITE_SIZE)
                 self.move(positional_offset)
             damage, damage_type = self.attack(nearest_enemy.get_best_dv())
+            print("{}: Attacking {} with {} damage of type {}.".format(
+                self.name, nearest_enemy.get_name(), damage, damage_type))
             nearest_enemy.soak(damage, damage_type)
             return self.weapon['speed']
         elif self.get_target_position() is not None:

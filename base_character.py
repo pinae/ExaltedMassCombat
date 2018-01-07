@@ -195,7 +195,8 @@ class BaseCharacter(Actor):
             attack_range = (0.5 + self.weapon["range"])
             if nearest_enemy_distance > attack_range * attack_range:
                 positional_offset = nearest_enemy.get_position() - self.get_position()
-                positional_offset.scale_to_length((max_attack_range - attack_range) * SPRITE_SIZE)
+                positional_offset.scale_to_length(
+                    (positional_offset.length() / SPRITE_SIZE - attack_range) * SPRITE_SIZE)
                 self.move(positional_offset)
             damage, damage_type = self.attack(nearest_enemy.get_best_dv())
             print("{}: Attacking {} with {} damage of type {}.".format(
@@ -204,9 +205,13 @@ class BaseCharacter(Actor):
             return self.weapon['speed']
         elif self.get_target_position() is not None:
             positional_offset = self.get_target_position() - self.get_position()
-            positional_offset.scale_to_length(self.get_movement_distance() * SPRITE_SIZE)
+            positional_offset.scale_to_length(
+                min(positional_offset.length(), self.get_movement_distance() * SPRITE_SIZE))
             print("{}: Moving to position {}.".format(self.name, positional_offset))
             self.move(positional_offset)
+            if (self.get_target_position() - self.get_position()).length() < 0.1:
+                self.set_target_position(None)
             return 1
         else:  # We wait because we have no orders.
+            print("{}: Waiting because I have no orders.".format(self.name))
             return 1

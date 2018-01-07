@@ -66,7 +66,6 @@ class Game(object):
                 if event.button == 2:
                     print(event)
                 if event.button == 3 and len(self.selected_actors) > 0:
-                    print("move actors: " + str(self.selected_actors))
                     for actor in self.selected_actors:
                         actor.set_target_position((mouse_position[0], mouse_position[1]))
             if event.type == pygame.MOUSEBUTTONUP:
